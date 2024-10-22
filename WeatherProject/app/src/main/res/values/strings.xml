@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">WeatherProject</string>
+    <string name="title_activity_navigation">navigation</string>
+    <string name="title_home">Home</string>
+    <string name="title_favourite">Favourite</string>
+    <string name="title_alerts">Alerts</string>
+    <string name="settings">Settings</string>
+    <string name="title_settings">Settings</string>
+    <string name="humidity">Humidity</string>
+</resources>
