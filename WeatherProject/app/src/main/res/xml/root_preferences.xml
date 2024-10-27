@@ -1,0 +1,52 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    app:iconSpaceReserved="false"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory
+        android:icon="@drawable/settings"
+        android:layout="@layout/custom_preference_header"
+        android:title="@string/setting" />
+
+    <ListPreference
+        android:defaultValue="en"
+        android:entries="@array/language_entries"
+        android:entryValues="@array/language_values"
+        android:icon="@drawable/world"
+        android:key="language_preference"
+        android:summary="Choose the app language"
+        android:title="@string/selectlang"
+        app:useSimpleSummaryProvider="true" />
+
+    <ListPreference
+        android:defaultValue="kelvin"
+        android:entries="@array/temp_unit_entries"
+        android:entryValues="@array/temp_unit_values"
+        android:icon="@drawable/thermometer"
+        android:key="temp_unit_preference"
+        android:summary="Select temperature unit"
+        android:title="@string/tempunit"
+        app:useSimpleSummaryProvider="true" />
+
+    <ListPreference
+        android:defaultValue="gps"
+        android:entries="@array/location_entries"
+        android:entryValues="@array/location_values"
+        android:icon="@drawable/location"
+        android:key="location_preference"
+        android:summary="Select how to determine location"
+        android:title="@string/locationsrc"
+        app:useSimpleSummaryProvider="true" />
+
+    <ListPreference
+        android:defaultValue="meter_sec"
+        android:entries="@array/wind_speed_entries"
+        android:entryValues="@array/wind_speed_values"
+        android:icon="@drawable/windicon"
+        android:key="wind_speed_preference"
+        android:summary="Select wind speed unit"
+        android:title="@string/windspeedunit"
+        app:useSimpleSummaryProvider="true" />
+
+</PreferenceScreen>

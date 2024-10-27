@@ -1,0 +1,64 @@
+<!-- res/values-ro/strings.xml -->
+<resources>
+    <string name="app_name">Proiectul vremii</string>
+    <string name="title_activity_navigation">Navigare</string>
+    <string name="title_home">Acasă</string>
+    <string name="title_favourite">Preferate</string>
+    <string name="title_alerts">Alerte</string>
+    <string name="settings">Setări</string>
+    <string name="title_settings">Setări</string>
+    <string name="humidity">Umiditate</string>
+    <string name="pressure">Presiune</string>
+    <string name="wind">Vânt</string>
+    <string name="selectlang">Alege limba</string>
+    <string name="tempunit">Unitatea de temperatură</string>
+    <string name="locationsrc">Sursa locației</string>
+    <string name="windspeedunit">Unitatea de viteză a vântului</string>
+    <string name="setting">Setări</string>
+
+    <string-array name="language_entries">
+        <item>Română</item>
+        <item>Engleză</item>
+        <item>Arabă</item>
+        <item>limba implicită</item>
+    </string-array>
+    <string-array name="language_values">
+        <item>ro</item>
+        <item>en</item>
+        <item>ar</item>
+        <item>def</item>
+    </string-array>
+
+    <string-array name="temp_unit_entries">
+        <item>Grade Celsius</item>
+        <item>Kelvin</item>
+        <item>Fahrenheit</item>
+    </string-array>
+    <string-array name="temp_unit_values">
+        <item>celsius</item>
+        <item>kelvin</item>
+        <item>fahrenheit</item>
+    </string-array>
+
+    <string-array name="location_entries">
+        <item>Sistem GPS</item>
+        <item>Hartă</item>
+    </string-array>
+    <string-array name="location_values">
+        <item>gps</item>
+        <item>map</item>
+    </string-array>
+
+
+    <string-array name="wind_speed_entries">
+        <item>Metri pe secundă</item>
+        <item>milă pe oră</item>
+    </string-array>
+    <string-array name="wind_speed_values">
+        <item>meter_sec</item>
+        <item>mile_hour</item>
+    </string-array>
+
+    <!-- Keep sensitive data like API keys the same -->
+    <string name="google_maps_key">AIzaSyAQCz8DFn3w2ViFKcct5DVVtexJv6bS7M8</string>
+</resources>

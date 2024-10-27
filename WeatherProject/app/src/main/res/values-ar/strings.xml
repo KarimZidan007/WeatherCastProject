@@ -1,0 +1,63 @@
+<!-- res/values-ar/strings.xml -->
+<resources>
+    <string name="app_name">مشروع الطقس</string>
+    <string name="title_activity_navigation">التنقل</string>
+    <string name="title_home">الرئيسية</string>
+    <string name="title_favourite">المفضلة</string>
+    <string name="title_alerts">التنبيهات</string>
+    <string name="settings">الإعدادات</string>
+    <string name="title_settings">الإعدادات</string>
+    <string name="humidity">الرطوبة</string>
+    <string name="pressure">الضغط</string>
+    <string name="wind">الرياح</string>
+    <string name="selectlang">اختر اللغة</string>
+    <string name="tempunit">وحدة درجة الحرارة</string>
+    <string name="locationsrc">مصدر الموقع</string>
+    <string name="windspeedunit">وحدة سرعة الرياح</string>
+    <string name="setting">الإعدادات</string>
+
+    <string-array name="language_entries">
+        <item>العربية</item>
+        <item>الإنجليزية</item>
+        <item>الرومانية</item>
+        <item>اللغة الافتراضية</item>
+    </string-array>
+    <string-array name="language_values">
+        <item>ar</item>
+        <item>en</item>
+        <item>ro</item>
+        <item>def</item>
+    </string-array>
+
+    <string-array name="temp_unit_entries">
+        <item>درجة مئوية</item>
+        <item>كلفن</item>
+        <item>فهرنهايت</item>
+    </string-array>
+    <string-array name="temp_unit_values">
+        <item>celsius</item>
+        <item>kelvin</item>
+        <item>fahrenheit</item>
+    </string-array>
+
+    <string-array name="location_entries">
+        <item>نظام تحديد المواقع</item>
+        <item>الخريطة</item>
+    </string-array>
+    <string-array name="location_values">
+        <item>gps</item>
+        <item>map</item>
+    </string-array>
+
+    <string-array name="wind_speed_entries">
+        <item>متر/ثانية</item>
+        <item>ميل/ساعة</item>
+    </string-array>
+    <string-array name="wind_speed_values">
+        <item>meter_sec</item>
+        <item>mile_hour</item>
+    </string-array>
+
+    <!-- Keep sensitive data like API keys the same -->
+    <string name="google_maps_key">AIzaSyAQCz8DFn3w2ViFKcct5DVVtexJv6bS7M8</string>
+</resources>

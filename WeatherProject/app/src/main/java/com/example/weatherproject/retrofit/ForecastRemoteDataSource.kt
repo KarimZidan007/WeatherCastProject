@@ -1,8 +1,11 @@
 
 
 
+import android.location.Location
 import com.example.labone.retrofit.Services
+import com.example.weatherproject.model.WeatherResponse
 import com.example.weatherproject.model.pojos.Root
+import com.example.weatherproject.model.pojos.Weather
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -19,8 +22,11 @@ import retrofit2.converter.gson.GsonConverterFactory
              retrofit.create(Services::class.java)
          }
      }
-       suspend fun getForecastOverNetwork() : Root {
-           return getApiService().getForecast(59.0,-0.1,"metric" ,apiKey)
+       suspend fun getForecastOverNetwork(location: Location,languague:String) : Root {
+           return getApiService().getForecast(location.latitude,location.longitude,"metric" ,apiKey,languague)
+       }
+       suspend fun getCurrentWeatherOverNetwork(location: Location,languague:String) : WeatherResponse {
+           return getApiService().getWeather(location.latitude,location.longitude,"metric" ,apiKey,languague)
        }
     companion object {
         fun getApiService() : Services = RetroFitHelper.service

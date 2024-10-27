@@ -37,7 +37,14 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        dataBinding = true
     }
+    bundle {
+        language {
+            enableSplit = false
+        }
+    }
+
 }
 
 dependencies {
@@ -51,6 +58,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
+    implementation(libs.androidx.preference)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -69,4 +77,16 @@ dependencies {
     implementation ("androidx.test.espresso:espresso-core:3.6.1")
     implementation ("com.github.MatteoBattilana:WeatherView:3.0.0")
     implementation ("com.github.Dimezis:BlurView:version-2.0.5")
+    implementation("androidx.preference:preference-ktx:1.2.0")
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+    implementation("com.google.android.gms:play-services-maps:18.1.0")
+    implementation("com.google.android.libraries.places:places:2.5.0")
+    implementation ("com.zeugmasolutions.localehelper:locale-helper-android:1.5.1")
+    implementation ("org.osmdroid:osmdroid-android:6.1.12")
+
+
+
+
+
+
 }
