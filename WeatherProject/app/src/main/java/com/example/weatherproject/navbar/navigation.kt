@@ -1,7 +1,6 @@
 package com.example.weatherproject.navbar
 
 import android.content.Context
-import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Build
@@ -10,10 +9,7 @@ import android.os.StrictMode
 import android.os.StrictMode.ThreadPolicy
 import android.util.Log
 import android.view.WindowManager
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -23,23 +19,15 @@ import com.example.weatherproject.ContextUtils
 import com.example.weatherproject.R
 import com.example.weatherproject.databinding.ActivityNavigationBinding
 import com.example.weatherproject.locale.BaseActivity
-import com.example.weatherproject.model.repository.SettingsRepository
-import com.example.weatherproject.navbar.ui.settings.SettingsFactory
-import com.example.weatherproject.navbar.ui.settings.SettingsViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import java.util.Locale
-import kotlin.math.log
 
 
 class navigation : BaseActivity(){
 
     private lateinit var binding: ActivityNavigationBinding
-    private lateinit var settingsViewModel: SettingsViewModel
-    private lateinit var settingRepository: SettingsRepository
     private lateinit var sharedPreferences: SharedPreferences
-    private lateinit var languague: String
     private lateinit var currentLocale: Locale
-
     override fun attachBaseContext(newBase: Context) {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(newBase)
         val languageCode = sharedPreferences.getString("language_preference", "en") ?: "en"
@@ -59,7 +47,6 @@ class navigation : BaseActivity(){
         }
         binding = ActivityNavigationBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
         val navView: BottomNavigationView = binding.navView
@@ -82,11 +69,5 @@ class navigation : BaseActivity(){
         }
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
-
     }
-
-
-
-
-
 }

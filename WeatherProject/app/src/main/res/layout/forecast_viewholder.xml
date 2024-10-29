@@ -1,56 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
-    android:layout_height="140dp"
-    android:layout_marginHorizontal="4dp"
-    android:orientation="vertical">
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="14dp"
+    android:layout_marginVertical="16dp"
+    app:cardBackgroundColor="#40000000"
+    app:cardElevation="4dp"
+    app:cardCornerRadius="8dp">
 
-    <TextView
-        android:id="@+id/namedaytext"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:shadowColor="@color/black"
-        android:shadowDx="1"
-        android:shadowDy="1"
-        android:shadowRadius="3"
-        android:text="-"
-        android:textAlignment="center"
-        android:textColor="@color/white"
-        android:textSize="14sp" />
+        android:layout_height="50dp"
+        android:padding="8dp">
 
-    <TextView
-        android:id="@+id/hourtext"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:shadowColor="@color/black"
-        android:shadowDx="1"
-        android:shadowDy="1"
-        android:shadowRadius="3"
-        android:text="-"
-        android:textAlignment="center"
-        android:textColor="@color/white"
-        android:textSize="14sp" />
+        <TextView
+            android:id="@+id/namedaytext"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:shadowColor="@color/black"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="3"
+            android:text="-"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            app:layout_constraintWidth_percent="0.35"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginEnd="4dp"/>
 
-    <ImageView
-        android:id="@+id/pic"
-        android:layout_width="45dp"
-        android:layout_height="45dp"
-        android:layout_marginVertical="8dp"
-        tools:srcCompat="@drawable/sunny" />
+        <TextView
+            android:id="@+id/hourtext"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:shadowColor="@color/black"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="3"
+            android:text="-"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            app:layout_constraintWidth_percent="0.22"
+            app:layout_constraintStart_toEndOf="@id/namedaytext"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginEnd="8dp"/>
 
-    <TextView
-        android:id="@+id/rectemptext"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:shadowColor="@color/black"
-        android:shadowDx="1"
-        android:shadowDy="1"
-        android:shadowRadius="3"
-        android:text="-"
-        android:textAlignment="center"
-        android:textColor="@color/white"
-        android:textSize="14sp" />
-</LinearLayout>
+        <ImageView
+            android:id="@+id/pic"
+            android:layout_width="0dp"
+            android:layout_height="45dp"
+            android:foregroundGravity="center_horizontal"
+            app:layout_constraintWidth_percent="0.24"
+            app:layout_constraintStart_toEndOf="@id/hourtext"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginEnd="4dp"
+            tools:srcCompat="@drawable/sunny" />
+
+        <TextView
+            android:id="@+id/rectemptext"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:shadowColor="@color/black"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="3"
+            android:text="-"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            app:layout_constraintWidth_percent="0.15"
+            app:layout_constraintStart_toEndOf="@id/pic"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>

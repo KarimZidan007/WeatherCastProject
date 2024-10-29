@@ -83,10 +83,7 @@ dependencies {
     implementation("com.google.android.libraries.places:places:2.5.0")
     implementation ("com.zeugmasolutions.localehelper:locale-helper-android:1.5.1")
     implementation ("org.osmdroid:osmdroid-android:6.1.12")
-
-
-
-
-
+    implementation ("androidx.cardview:cardview:1.0.0")
+    implementation ("pl.droidsonroids.gif:android-gif-drawable:1.2.29")
 
 }

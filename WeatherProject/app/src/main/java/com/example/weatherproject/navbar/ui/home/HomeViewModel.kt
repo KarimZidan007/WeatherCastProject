@@ -26,12 +26,8 @@ class HomeViewModel(private var remoteRepository:RemoteRepository) : ViewModel()
 
     private val _weatherDetailsStateFlow = MutableStateFlow<ApiState>(ApiState.Loading)
     val weatherDetailsStateFlow: StateFlow<ApiState> = _weatherDetailsStateFlow
-
     private val _currentWeather = MutableStateFlow<WeatherApiState>(WeatherApiState.Loading)
     var currentWeather: StateFlow<WeatherApiState> = _currentWeather
-
-
-
     var temperatureUnitSymbol = "°"
     var windUnitSymbol = "m/s"
     fun getCurrentWeather(
@@ -68,14 +64,11 @@ class HomeViewModel(private var remoteRepository:RemoteRepository) : ViewModel()
             when (tempUnit) {
                 "celsius" -> {
                 }
-
                 "kelvin" -> {
-
                     for (i in 0..result.list.size - 1) {
                         result.list.get(i).main.temp = celsiusToKelvin(result.list.get(i).main.temp)
                     }
                 }
-
                 "fahrenheit" -> {
                     for (i in 0..result.list.size - 1) {
                         result.list.get(i).main.temp =
@@ -87,14 +80,12 @@ class HomeViewModel(private var remoteRepository:RemoteRepository) : ViewModel()
             when (tempUnit) {
                 "celsius" -> {
                 }
-
                 "kelvin" -> {
 
                     for (i in 0..result.list.size - 1) {
                         result.list.get(i).main.temp = celsiusToKelvin(result.list.get(i).main.temp)
                     }
                 }
-
                 "fahrenheit" -> {
                     temperatureUnitSymbol = "F°"
                     for (i in 0..result.list.size - 1) {
@@ -126,30 +117,30 @@ class HomeViewModel(private var remoteRepository:RemoteRepository) : ViewModel()
             // Temperature conversion and rounding
             when (tempUnit) {
                 "celsius" -> {
-                    result.temp = convertToArabicNumerals(tempObj.main.temp.roundToInt().toString()) + " °"
-                    result.maxTemp = convertToArabicNumerals(tempObj.main.temp_max.roundToInt().toString()) + " °"
-                    result.minTemp = convertToArabicNumerals(tempObj.main.temp_min.roundToInt().toString()) + " °"
+                    result.temp = convertToArabicNumerals(tempObj.main.temp.roundToInt().toString()) + " س°"
+                    result.maxTemp = convertToArabicNumerals(tempObj.main.temp_max.roundToInt().toString()) + " س°"
+                    result.minTemp = convertToArabicNumerals(tempObj.main.temp_min.roundToInt().toString()) + " س°"
                 }
                 "kelvin" -> {
-                    result.temp = convertToArabicNumerals(celsiusToKelvin(tempObj.main.temp).roundToInt().toString()) + " °"
-                    result.maxTemp = convertToArabicNumerals(celsiusToKelvin(tempObj.main.temp_max).roundToInt().toString()) + " °"
-                    result.minTemp = convertToArabicNumerals(celsiusToKelvin(tempObj.main.temp_min).roundToInt().toString()) + " °"
+                    result.temp = convertToArabicNumerals(celsiusToKelvin(tempObj.main.temp).roundToInt().toString()) + " ك°"
+                    result.maxTemp = convertToArabicNumerals(celsiusToKelvin(tempObj.main.temp_max).roundToInt().toString()) + " ك°"
+                    result.minTemp = convertToArabicNumerals(celsiusToKelvin(tempObj.main.temp_min).roundToInt().toString()) + " ك°"
                 }
                 "fahrenheit" -> {
-                    result.temp = convertToArabicNumerals(celsiusToFahrenheit(tempObj.main.temp).roundToInt().toString()) + " °"
-                    result.maxTemp = convertToArabicNumerals(celsiusToFahrenheit(tempObj.main.temp_max).roundToInt().toString()) + " °"
-                    result.minTemp = convertToArabicNumerals(celsiusToFahrenheit(tempObj.main.temp_min).roundToInt().toString()) + " °"
+                    result.temp = convertToArabicNumerals(celsiusToFahrenheit(tempObj.main.temp).roundToInt().toString()) + " ف°"
+                    result.maxTemp = convertToArabicNumerals(celsiusToFahrenheit(tempObj.main.temp_max).roundToInt().toString()) + " ف°"
+                    result.minTemp = convertToArabicNumerals(celsiusToFahrenheit(tempObj.main.temp_min).roundToInt().toString()) + " ف°"
                 }
             }
 
             // Wind speed conversion and rounding
             result.windSpeed = when (windUnit) {
                 "mile_hour" -> {
-                    windUnitSymbol = "ميل/ساعة"
+                    windUnitSymbol = "ميل/س"
                     convertToArabicNumerals(metersPerSecondToMilesPerHour(tempObj.wind.speed).roundToInt().toString()) + " " + windUnitSymbol
                 }
                 "meter_sec" -> {
-                    windUnitSymbol = "متر/ثانية"
+                    windUnitSymbol = "م/ث"
                     convertToArabicNumerals(tempObj.wind.speed.roundToInt().toString()) + " " + windUnitSymbol
                 }
                 else -> tempObj.wind.speed.toString()  // Default case
@@ -163,19 +154,19 @@ class HomeViewModel(private var remoteRepository:RemoteRepository) : ViewModel()
             // Temperature conversion and rounding
             when (tempUnit) {
                 "celsius" -> {
-                    result.temp = tempObj.main.temp.roundToInt().toString() + " °"
-                    result.maxTemp = tempObj.main.temp_max.roundToInt().toString() + " °"
-                    result.minTemp = tempObj.main.temp_min.roundToInt().toString() + " °"
+                    result.temp = tempObj.main.temp.roundToInt().toString() + " c°"
+                    result.maxTemp = tempObj.main.temp_max.roundToInt().toString() + " c°"
+                    result.minTemp = tempObj.main.temp_min.roundToInt().toString() + " c°"
                 }
                 "kelvin" -> {
-                    result.temp = celsiusToKelvin(tempObj.main.temp).roundToInt().toString() + " °"
-                    result.maxTemp = celsiusToKelvin(tempObj.main.temp_max).roundToInt().toString() + " °"
-                    result.minTemp = celsiusToKelvin(tempObj.main.temp_min).roundToInt().toString() + " °"
+                    result.temp = celsiusToKelvin(tempObj.main.temp).roundToInt().toString() + " k°"
+                    result.maxTemp = celsiusToKelvin(tempObj.main.temp_max).roundToInt().toString() + " k°"
+                    result.minTemp = celsiusToKelvin(tempObj.main.temp_min).roundToInt().toString() + " k°"
                 }
                 "fahrenheit" -> {
-                    result.temp = celsiusToFahrenheit(tempObj.main.temp).roundToInt().toString() + " °"
-                    result.maxTemp = celsiusToFahrenheit(tempObj.main.temp_max).roundToInt().toString() + " °"
-                    result.minTemp = celsiusToFahrenheit(tempObj.main.temp_min).roundToInt().toString() + " °"
+                    result.temp = celsiusToFahrenheit(tempObj.main.temp).roundToInt().toString() + " f°"
+                    result.maxTemp = celsiusToFahrenheit(tempObj.main.temp_max).roundToInt().toString() + " f°"
+                    result.minTemp = celsiusToFahrenheit(tempObj.main.temp_min).roundToInt().toString() + " f°"
                 }
             }
 

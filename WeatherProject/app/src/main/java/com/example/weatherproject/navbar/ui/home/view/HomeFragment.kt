@@ -8,6 +8,7 @@ import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,6 +22,7 @@ import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mvvm_demo.model.datasources.RemoteDataSrcImplementation
 import com.example.mvvm_demo.model.repository.RemoteRepository
+import com.example.weatherproject.MapActivity
 import com.example.weatherproject.R
 import com.example.weatherproject.databinding.FragmentHomeBinding
 import com.example.weatherproject.model.ApiState
@@ -60,6 +62,7 @@ class HomeFragment : Fragment() {
     private var timer: Timer? = null
     private lateinit var fusedClient:FusedLocationProviderClient
     private val calendar by lazy { Calendar.getInstance() }
+    private lateinit var location:Location
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -72,10 +75,14 @@ class HomeFragment : Fragment() {
         activity?.window?.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
         binding.apply {
             citytxt.text="Giza"
+            citytxt.setOnClickListener {
+                openMap()
+            }
             progressBar.visibility=View.VISIBLE
-            detailLayout.visibility=View.INVISIBLE
             tempo.visibility=View.INVISIBLE
+            detailCard.visibility=View.INVISIBLE
         }
+
         retroSrc=ForecastRemoteDataSource()
         remoteSrc=RemoteDataSrcImplementation(retroSrc)
         remoteRepository=RemoteRepository(remoteSrc)
@@ -112,16 +119,22 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         activity?.let {
-            var radius=10f
-            var decorView=it.window.decorView
+            val radius = 10f
+            val decorView = it.window.decorView
             val rootView = decorView.findViewById<ViewGroup>(android.R.id.content)
-            val windowBackground=decorView.background
-            rootView?.let {
-                binding.blueView.setupWith(it, RenderScriptBlur(requireContext()))
+            val windowBackground = decorView.background
+
+            rootView?.let { root ->
+                binding.blueView.setupWith(root, RenderScriptBlur(requireContext()))
                     .setFrameClearDrawable(windowBackground)
                     .setBlurRadius(radius)
-                binding.blueView.outlineProvider=ViewOutlineProvider.BACKGROUND
-                binding.blueView.clipToOutline=true
+                binding.blueView.outlineProvider = ViewOutlineProvider.BACKGROUND
+                binding.blueView.clipToOutline = true
+                binding.blueViewThree.setupWith(root, RenderScriptBlur(requireContext()))
+                    .setFrameClearDrawable(windowBackground)
+                    .setBlurRadius(radius)
+                binding.blueViewThree.outlineProvider = ViewOutlineProvider.BACKGROUND
+                binding.blueViewThree.clipToOutline = true
             }
         }
         lifecycleScope.launch {
@@ -131,8 +144,8 @@ class HomeFragment : Fragment() {
                         //Current Weather
                         binding.apply {
                             progressBar.visibility = View.GONE
-                            detailLayout.visibility = View.VISIBLE
                             tempo.visibility = View.VISIBLE
+                            detailCard.visibility=View.VISIBLE
                             datetime.text = dateFormat.format(Date())
                             PressureValue.text = it.currentWeather.pressure
                             citytxt.text = it.currentWeather.cityName
@@ -146,7 +159,7 @@ class HomeFragment : Fragment() {
                             MinTempText.text =
                                 it.currentWeather.minTemp
                             humidityUnit.text = it.currentWeather.humidity
-                            val drawable = if (isNightNow()) R.drawable.night_bg
+                            val drawable = if (isNightNow()) R.drawable.cloud
                             else {
                                 setDynamicWallper(it.currentWeather.icon)
                             }
@@ -179,7 +192,7 @@ class HomeFragment : Fragment() {
                             blueView.visibility=View.VISIBLE
                             RecyclerAdapter.submitList(it.weatherDetails.list)
                             forecastView.apply {
-                                layoutManager=LinearLayoutManager(requireContext(),LinearLayoutManager.HORIZONTAL,false)
+                                layoutManager=LinearLayoutManager(requireContext(),LinearLayoutManager.VERTICAL,false)
                                 adapter=RecyclerAdapter
                             }
                         }
@@ -214,7 +227,8 @@ class HomeFragment : Fragment() {
     }
     private fun isNightNow() : Boolean
     {
-        return calendar.get(Calendar.HOUR_OF_DAY)>=10
+        return (calendar.get(Calendar.HOUR_OF_DAY)>18 || calendar.get(Calendar.HOUR_OF_DAY)<6)
+        //  return (calendar.get(Calendar.HOUR_OF_DAY)>10)
     }
     private fun setDynamicWallper(icon:String):Int
     {
@@ -222,23 +236,23 @@ class HomeFragment : Fragment() {
        {
            "01" ->{
                initWeatherView(PrecipType.CLEAR)
-               R.drawable.snow_bg
+               R.drawable.clearsky
            }
            "02","03","04" ->{
                initWeatherView(PrecipType.CLEAR)
-               R.drawable.cloudy_bg
+               R.drawable.cloud
            }
            "09","10","11" ->{
                initWeatherView(PrecipType.RAIN)
-               R.drawable.rainy_bg
+               R.drawable.rain
            }
            "13" ->{
                initWeatherView(PrecipType.SNOW)
-               R.drawable.snow_bg
+               R.drawable.snow
            }
            "50"->{
                initWeatherView(PrecipType.CLEAR)
-               R.drawable.haze_bg
+               R.drawable.haze
            }
            else -> 0
        }
@@ -291,12 +305,10 @@ class HomeFragment : Fragment() {
             )
         } else {
            fusedClient.lastLocation.addOnSuccessListener {
-               homeViewModel.getWeatherDetails5days3hours(it, settingsViewModel.getLanguagueBasedOnPreference(),settingsViewModel.getTemperatureBasedPreference())
-               homeViewModel.getCurrentWeather(it, settingsViewModel.getLanguagueBasedOnPreference(),settingsViewModel.getTemperatureBasedPreference(),settingsViewModel.getWindSpeedBasedPreference())
-
+               homeViewModel.getWeatherDetails5days3hours((it?:Location("place").apply{latitude=30.0;latitude=30.0}), settingsViewModel.getLanguagueBasedOnPreference(),settingsViewModel.getTemperatureBasedPreference())
+               homeViewModel.getCurrentWeather((it?:Location("place").apply{latitude=30.0;latitude=30.0}), settingsViewModel.getLanguagueBasedOnPreference(),settingsViewModel.getTemperatureBasedPreference(),settingsViewModel.getWindSpeedBasedPreference())
             }
         }
-
     }
 
     override fun onRequestPermissionsResult(
@@ -317,10 +329,23 @@ class HomeFragment : Fragment() {
              }
         }
     }
-//    fun openMap()
-//    {
-//        var intent:Intent = Intent(requireContext(),MapActivity::class.java)
-//        startActivityForResult(intent, 100)
-//    }
-
+    fun openMap()
+    {
+        var intent:Intent = Intent(requireContext(), MapActivity::class.java)
+        startActivityForResult(intent, 100)
+    }
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 100 && resultCode == Activity.RESULT_OK) {
+            val latitude = data?.getDoubleExtra("latitude", 60.0)
+            val longitude = data?.getDoubleExtra("longitude", 30.0)
+            location = Location("selected_location").apply {
+                latitude?.let { this.latitude = it }
+                longitude?.let { this.longitude = it }
+            }
+            settingsViewModel.updateLastLocation(location)
+            homeViewModel.getCurrentWeather(settingsViewModel.lastLocation.value,
+                settingsViewModel.getLanguagueBasedOnPreference(),settingsViewModel.getTemperatureBasedPreference(),settingsViewModel.getWindSpeedBasedPreference())
+        }
+    }
 }

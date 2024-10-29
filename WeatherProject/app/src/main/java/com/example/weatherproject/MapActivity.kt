@@ -4,13 +4,18 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.location.Geocoder
+import android.location.Location
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import androidx.preference.PreferenceManager
+import com.example.weatherproject.model.repository.SettingsRepository
+import com.example.weatherproject.navbar.ui.settings.SettingsFactory
+import com.example.weatherproject.navbar.ui.settings.SettingsViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -30,7 +35,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private var currentMarker: Marker? = null
     private lateinit var selectedLatLng: LatLng
     private lateinit var currentLocale: Locale
-    private lateinit var sharedPreferences: SharedPreferences
+    private lateinit var sharedPreferences :SharedPreferences
 
     override fun attachBaseContext(newBase: Context) {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(newBase)
@@ -50,7 +55,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
-
         btnSelectLocation.setOnClickListener {
             val intent = Intent()
             intent.putExtra("latitude", selectedLatLng.latitude)
@@ -59,6 +63,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             finish()
         }
     }
+
 
     override fun onMapReady(googleMap: GoogleMap) {
 
