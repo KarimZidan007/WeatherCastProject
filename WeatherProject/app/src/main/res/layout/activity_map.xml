@@ -15,12 +15,30 @@
         app:navigationIcon="@drawable/back"
         android:visibility="gone"/>
 
+    <LinearLayout
+        android:id="@+id/searchlayout"
+        android:paddingTop="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <SearchView
+            android:id="@+id/search_bar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:hint="Enter place name"
+            android:background="@android:color/white"
+            />
+
+
+    </LinearLayout>
+
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="739dp"
-        android:layout_below="@id/toolbar"
+        android:layout_height="match_parent"
+        android:layout_below="@id/searchlayout"
         android:layout_marginTop="7dp" />
 
     <eightbitlab.com.blurview.BlurView

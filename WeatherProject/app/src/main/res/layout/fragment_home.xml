@@ -37,7 +37,7 @@ d
         <androidx.cardview.widget.CardView
             android:id="@+id/weeklydetails"
             android:layout_width="300dp"
-            android:layout_height="300dp"
+            android:layout_height="wrap_content"
             app:cardBackgroundColor="#70000000"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

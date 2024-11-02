@@ -10,6 +10,7 @@ import android.os.StrictMode.ThreadPolicy
 import android.util.Log
 import android.view.WindowManager
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -47,6 +48,11 @@ class navigation : BaseActivity(){
         }
         binding = ActivityNavigationBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        window.apply {
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION)
+            window.navigationBarColor = ContextCompat.getColor(context, R.color.black)
+        }
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
         val navView: BottomNavigationView = binding.navView

@@ -7,11 +7,15 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.weatherproject.databinding.ForecastViewholderBinding
-import com.example.weatherproject.model.pojos.Forecast
+import com.example.weatherproject.model.Helpers.Conversions
+import com.example.weatherproject.model.pojos.ForecastFinal
 import java.text.SimpleDateFormat
-import kotlin.math.roundToInt
 
-class ForecastAdapter : ListAdapter<Forecast,ForecastAdapter.ViewHolder> (ForecastDiffUtil()){
+class ForecastAdapter(private var language: String = "en") : ListAdapter<ForecastFinal,ForecastAdapter.ViewHolder> (ForecastDiffUtil()){
+    fun updateLang(lang:String)
+    {
+        language=lang
+    }
     class ViewHolder(val binding: ForecastViewholderBinding): RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -25,32 +29,94 @@ class ForecastAdapter : ListAdapter<Forecast,ForecastAdapter.ViewHolder> (Foreca
         val date = SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(currentObj.dt_txt.toString())
         val calendar= Calendar.getInstance()
         calendar.time=date
-        val dayOfWeekName=when(calendar.get(Calendar.DAY_OF_WEEK))
-        {
-            1->"Sunday"
-            2->"Monday"
-            3->"Tuesday"
-            4->"Wednesday"
-            5->"Thursday"
-            6->"Friday"
-            7->"Saturday"
-            else->""
-        }
+
         val hour=calendar.get(Calendar.HOUR_OF_DAY)
-        val amPm = if(hour<12)"am" else "pm"
-        val hour12=calendar.get(Calendar.HOUR)
-        val icon = when(currentObj.weather.get(0).icon.toString())
-        {
-            "01d","0n" -> "sunny"
-            "02d","02n" -> "cloudy_sunny"
-            "03d","03n" -> "cloudy_sunny"
-            "04d","04n" -> "cloudy"
-            "09d","09n" -> "rainy"
-            "10d","10n" -> "rainy"
-            "11d","11n" -> "storm"
-            "13d","13n" -> "snowy"
-            "50d","50n" -> "windy"
-            else ->"sunny"
+        val amPm = if (calendar.get(Calendar.AM_PM) == Calendar.AM) {
+            when (language) {
+                "ar" -> "ص"
+                "ro" -> "AM"
+                else -> "AM"
+            }
+        } else {
+            when (language) {
+                "ar" -> "م"
+                "ro" -> "PM"
+                else -> "PM"
+            }
+        }
+        val icon = when (currentObj.icon) {
+            "01d", "01n" -> "sunny"
+            "02d", "02n" -> "cloudy_sunny"
+            "03d", "03n" -> "cloudy_sunny"
+            "04d", "04n" -> "cloudy"
+            "09d", "09n" -> "rainy"
+            "10d", "10n" -> "rainy"
+            "11d", "11n" -> "storm"
+            "13d", "13n" -> "snowy"
+            "50d", "50n" -> "windy"
+            else -> "sunny"
+        }
+        val hour12 = if (language == "ar") {
+            Conversions.convertToArabicNumerals(hour.toString()) // Call your conversion function for Arabic
+        } else {
+            hour.toString()
+        }
+
+        fun convertToArabicNumerals(englishNumber: String): String {
+            val englishToArabicMap = mapOf(
+                '0' to '٠',
+                '1' to '١',
+                '2' to '٢',
+                '3' to '٣',
+                '4' to '٤',
+                '5' to '٥',
+                '6' to '٦',
+                '7' to '٧',
+                '8' to '٨',
+                '9' to '٩'
+            )
+
+            return englishNumber.map { char ->
+                englishToArabicMap[char] ?: char
+            }.joinToString("")
+        }
+        val dayOfWeekName = when (calendar.get(Calendar.DAY_OF_WEEK)) {
+            Calendar.SUNDAY -> when (language) {
+                "ar" -> "الأحد"
+                "ro" -> "Duminică"
+                else -> "Sunday"
+            }
+            Calendar.MONDAY -> when (language) {
+                "ar" -> "الإثنين"
+                "ro" -> "Luni"
+                else -> "Monday"
+            }
+            Calendar.TUESDAY -> when (language) {
+                "ar" -> "الثلاثاء"
+                "ro" -> "Marți"
+                else -> "Tuesday"
+            }
+            Calendar.WEDNESDAY -> when (language) {
+                "ar" -> "الأربعاء"
+                "ro" -> "Miercuri"
+                else -> "Wednesday"
+            }
+            Calendar.THURSDAY -> when (language) {
+                "ar" -> "الخميس"
+                "ro" -> "Joi"
+                else -> "Thursday"
+            }
+            Calendar.FRIDAY -> when (language) {
+                "ar" -> "الجمعة"
+                "ro" -> "Vineri"
+                else -> "Friday"
+            }
+            Calendar.SATURDAY -> when (language) {
+                "ar" -> "السبت"
+                "ro" -> "Sâmbătă"
+                else -> "Saturday"
+            }
+            else -> ""
         }
         val drawableResourceId : Int = holder.binding.root.resources.getIdentifier(
             icon,"drawable",holder.binding.root.context.packageName
@@ -61,8 +127,9 @@ class ForecastAdapter : ListAdapter<Forecast,ForecastAdapter.ViewHolder> (Foreca
         holder.binding.apply {
             namedaytext.text=dayOfWeekName
             hourtext.text="$hour12$amPm"
-            rectemptext.text=currentObj.main.temp.roundToInt().toString()+"°"
+            rectemptext.text=currentObj.temp
         }
+
     }
 
 

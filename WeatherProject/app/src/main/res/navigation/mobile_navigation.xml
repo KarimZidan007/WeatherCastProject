@@ -13,13 +13,13 @@
 
     <fragment
         android:id="@+id/navigation_favourite"
-        android:name="com.example.weatherproject.navbar.ui.favourite.FavouriteFragment"
+        android:name="com.example.weatherproject.navbar.ui.favourite.view.FavouriteFragment"
         android:label="@string/title_favourite"
         tools:layout="@layout/fragment_favourite" />
 
     <fragment
         android:id="@+id/navigation_alerts"
-        android:name="com.example.weatherproject.navbar.ui.settings.SettingsFragment"
+        android:name="com.example.weatherproject.navbar.ui.alerts.AlertsFragment"
         android:label="@string/title_alerts"
         tools:layout="@layout/fragment_alerts" />
     <fragment

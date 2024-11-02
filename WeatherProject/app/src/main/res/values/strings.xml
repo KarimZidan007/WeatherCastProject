@@ -59,5 +59,6 @@
     </string-array>
 
     <string name="google_maps_key">AIzaSyAQCz8DFn3w2ViFKcct5DVVtexJv6bS7M8</string>
+    <string name="search">Search By City Name</string>
 
 </resources>

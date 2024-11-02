@@ -3,6 +3,8 @@ package com.example.weatherproject.navbar.ui.settings
 
 import android.location.Location
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.mvvm_demo.model.repository.RemoteRepository
@@ -14,6 +16,12 @@ import kotlinx.coroutines.flow.StateFlow
 import java.util.Locale
 
 class SettingsViewModel (private var settingsRepository : SettingsRepository): ViewModel() {
+
+    private val _isHomeFragmentVisible = MutableLiveData<Boolean>()
+    val isHomeFragmentVisible: LiveData<Boolean>  = _isHomeFragmentVisible
+    fun setHomeFragmentVisibility(isVisible: Boolean) {
+        _isHomeFragmentVisible.value = isVisible
+    }
 
     private val _settingsStateFlow = MutableStateFlow<UserSettings?>(UserSettings())
     val settingsStateFlow: StateFlow<UserSettings?> get() = _settingsStateFlow
