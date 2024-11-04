@@ -162,6 +162,14 @@ class HomeFragment : Fragment() {
             val forecast: FullWeatherDetails = args?.getParcelable("favCity") ?: FullWeatherDetails()
             updateWeatherUI(convertToWeatherFinal(forecast))
             updateForecastUI(forecast.weatherForecast)
+            binding.apply {
+                tempo.visibility = View.VISIBLE
+                detailCard.visibility = View.VISIBLE
+                blueView.visibility = View.VISIBLE
+                blueViewThree.visibility = View.VISIBLE
+                weeklydetails.visibility = View.VISIBLE
+                citytxt.visibility=View.VISIBLE
+            }
 
         } else {
             if(UserStates.checkConnectionState(requireContext()))

@@ -9,9 +9,14 @@
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/nav_view"
-        android:layout_width="360dp"
-        android:layout_height="75dp"
-        android:background="?android:attr/windowBackground"
+        android:layout_width="match_parent"
+        android:layout_height="81dp"
+        android:background="@color/black"
+        app:itemBackground="@android:color/black"
+        app:itemIconTint="@color/nav_icon_color_selector"
+        app:itemRippleColor="@color/black"
+        app:itemTextAppearanceActiveBoldEnabled="true"
+        app:itemTextColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"

@@ -105,6 +105,7 @@ dependencies {
     androidTestImplementation ("androidx.test.espresso:espresso-core:3.5.1")
 
     testImplementation ("org.jetbrains.kotlin:kotlin-test:$kotlin_version")
+    testImplementation ("org.mockito:mockito-core:4.0.0")
 
 
 

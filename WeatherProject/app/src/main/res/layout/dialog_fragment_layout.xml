@@ -5,7 +5,7 @@
     android:id="@+id/dialog_fragment"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/statusbar"
+    android:background="@color/quantum_grey900"
     android:orientation="vertical"
     android:padding="16dp">
 

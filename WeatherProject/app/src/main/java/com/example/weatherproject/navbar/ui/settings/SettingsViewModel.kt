@@ -7,12 +7,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.weatherproject.model.UserSettings
+import com.example.weatherproject.model.repository.setting.ISettingRepository
 import com.example.weatherproject.model.repository.setting.SettingsRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.util.Locale
 
-class SettingsViewModel (private var settingsRepository : SettingsRepository): ViewModel() {
+class SettingsViewModel (private var settingsRepository : ISettingRepository): ViewModel() {
 
     private val _isHomeFragmentVisible = MutableLiveData<Boolean>()
     val isHomeFragmentVisible: LiveData<Boolean>  = _isHomeFragmentVisible
