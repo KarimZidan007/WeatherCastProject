@@ -15,11 +15,30 @@ data class WeatherResponse(
     val dt: Int,
     val id: Int,
     val main: Main,
-    val name: String,
+    var name: String,
     val sys: Sys,
     val timezone: Int,
     val visibility: Int,
     val weather: List<Weather>,
-    val wind: Wind)
+    val wind: Wind){
+    constructor() : this(
+        base = "",
+        clouds = Clouds(),
+        cod = 0,
+        coord = Coord(),
+        dt = 0,
+        id = 0,
+        main = Main(),
+        name = "",
+        sys = Sys(),
+        timezone = 0,
+        visibility = 0,
+        weather = emptyList(),
+        wind = Wind()
+    )
+}
+
+
+
 
 

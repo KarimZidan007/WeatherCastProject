@@ -2,15 +2,12 @@ package com.example.weatherproject.navbar.ui.settings
 
 
 import android.location.Location
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.mvvm_demo.model.repository.RemoteRepository
 import com.example.weatherproject.model.UserSettings
-import com.example.weatherproject.model.repository.SettingsRepository
-import com.example.weatherproject.navbar.ui.home.HomeViewModel
+import com.example.weatherproject.model.repository.setting.SettingsRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.util.Locale

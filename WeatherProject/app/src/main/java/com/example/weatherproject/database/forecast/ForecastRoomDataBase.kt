@@ -6,11 +6,11 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.example.weatherproject.database.gsonConverter
-import com.example.weatherproject.model.pojos.FullWeatherDetails
+import com.example.weatherproject.model.gsonConverter
+import com.example.weatherproject.model.pojos.WeatherDb
 
 
-@Database(entities = [FullWeatherDetails::class],version=1)
+@Database(entities = [WeatherDb::class],version=1)
 @TypeConverters(gsonConverter::class)
 abstract class FullForecastRoomDataBase : RoomDatabase() {
     abstract fun getFavCitiesFullForecastDao(): ForecastDAO

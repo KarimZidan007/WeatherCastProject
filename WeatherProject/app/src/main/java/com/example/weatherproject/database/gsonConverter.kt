@@ -1,20 +1,20 @@
-package com.example.weatherproject.database
+package com.example.weatherproject.model
+
 import androidx.room.TypeConverter
-import com.example.weatherproject.model.pojos.ForecastFinal
+import com.example.weatherproject.model.pojos.ForecastDB
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
 class gsonConverter {
- private val gson = Gson()
 
     @TypeConverter
-    fun fromForecastList(value: List<ForecastFinal>?): String {
-        return gson.toJson(value)
+    fun fromForecastList(forecastList: List<ForecastDB>): String {
+        return Gson().toJson(forecastList)
     }
 
     @TypeConverter
-    fun toForecastList(value: String): List<ForecastFinal>? {
-        val listType = object : TypeToken<List<ForecastFinal>>() {}.type
-        return gson.fromJson(value, listType)
+    fun toForecastList(forecastString: String): List<ForecastDB> {
+        val listType = object : TypeToken<List<ForecastDB>>() {}.type
+        return Gson().fromJson(forecastString, listType)
     }
 }

@@ -1,25 +1,29 @@
 package com.example.weatherproject.navbar.ui.home
 
 
+import android.location.Geocoder
 import android.location.Location
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.mvvm_demo.model.repository.RemoteRepository
+import com.example.weatherproject.model.repository.remote.RemoteRepository
 import com.example.weatherproject.model.ApiState
 import com.example.weatherproject.model.Helpers.Conversions
 import com.example.weatherproject.model.WeatherApiState
+import com.example.weatherproject.model.repository.remote.IRemoteRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
-class HomeViewModel(private var remoteRepository:RemoteRepository) : ViewModel() {
+class HomeViewModel(private var remoteRepository: IRemoteRepository) : ViewModel() {
 
     private val _weatherDetailsStateFlow = MutableStateFlow<ApiState>(ApiState.Loading)
     val weatherDetailsStateFlow: StateFlow<ApiState> = _weatherDetailsStateFlow
+
     private val _currentWeather = MutableStateFlow<WeatherApiState>(WeatherApiState.Loading)
     var currentWeather: StateFlow<WeatherApiState> = _currentWeather
+
     private var covMang = Conversions
     fun getCurrentWeather(
         location: Location,
@@ -50,7 +54,7 @@ class HomeViewModel(private var remoteRepository:RemoteRepository) : ViewModel()
         }
 }
 
-class MyWeather3hours5daysFactory(private var remoteRepository:RemoteRepository ): ViewModelProvider.Factory{
+class MyWeather3hours5daysFactory(private var remoteRepository: RemoteRepository): ViewModelProvider.Factory{
     public override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return HomeViewModel(remoteRepository) as T
     }

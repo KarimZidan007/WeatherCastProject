@@ -1,9 +1,15 @@
 package com.example.weatherproject.model.Helpers
 
+import android.content.Context
+import android.location.Geocoder
 import com.example.weatherproject.model.WeatherResponse
+import com.example.weatherproject.model.pojos.ForecastDB
 import com.example.weatherproject.model.pojos.ForecastFinal
+import com.example.weatherproject.model.pojos.FullWeatherDetails
 import com.example.weatherproject.model.pojos.Root
+import com.example.weatherproject.model.pojos.WeatherDb
 import com.example.weatherproject.model.pojos.WeatherFinal
+import java.util.Locale
 import kotlin.math.roundToInt
 
 object  Conversions {
@@ -45,13 +51,13 @@ object  Conversions {
         var temperatureUnitSymbol = "°"
         var windUnitSymbol = "m/s"
         var result = WeatherFinal()
-        result.cityName = tempObj.name
         result.desc = tempObj.weather[0].description
         result.icon = tempObj.weather[0].icon
         result.latitude=tempObj.coord.lat
         result.longitude=tempObj.coord.lon
 
         if (languague == "ar") {
+            result.cityName = tempObj.name
             result.pressure = convertToArabicNumerals(tempObj.main.pressure.toString()) + " هكتوبسكال"
             result.humidity = convertToArabicNumerals(tempObj.main.humidity.toString()) + " %"
 
@@ -88,7 +94,7 @@ object  Conversions {
             }
 
         } else {
-            // English language setup
+            result.cityName = tempObj.name
             result.pressure = tempObj.main.pressure.toString() + " hpa"
             result.humidity = tempObj.main.humidity.toString() + " %"
 
@@ -124,151 +130,108 @@ object  Conversions {
             }
         }
 
+
         return result
     }
 
-    fun convertForecastList(
-        forecastList: List<ForecastFinal>,
+
+    fun convertCurrentWeatherDB(
+        tempObj: WeatherDb,
         tempUnit: String,
-        language: String
-    ): List<ForecastFinal> {
-        return forecastList.map { forecast ->
-            val tempString = forecast.temp
-            var finalTempValue = 0.0
-            var originalUnit: String? = null
+        windUnit: String,
+        languague: String,
+        geocoder: Geocoder
 
-            // Check if the temperature string is in Arabic or English
-            if (language == "ar") {
-                // Arabic language logic
-                when {
-                    tempString.contains("س") -> {
-                        // Celsius in Arabic
-                        originalUnit = "س"
-                        finalTempValue = tempString.substringBefore(" س").toDoubleOrNull() ?: 0.0
-                    }
-                    tempString.contains("ك") -> {
-                        // Kelvin in Arabic
-                        originalUnit = "ك"
-                        finalTempValue = tempString.substringBefore(" ك").toDoubleOrNull() ?: 0.0
-                    }
-                    tempString.contains("ف") -> {
-                        // Fahrenheit in Arabic
-                        originalUnit = "ف"
-                        finalTempValue = tempString.substringBefore(" ف").toDoubleOrNull() ?: 0.0
-                    }
+    ): FullWeatherDetails {
+
+
+        var temperatureUnitSymbol = "°"
+        var windUnitSymbol = "m/s"
+        var result = FullWeatherDetails()
+        result.icon = tempObj.icon
+        result.latitude=tempObj.lat_
+        result.longitude=tempObj.lng_
+
+        if (languague == "ar") {
+            result.cityName = tempObj.cityNameArabic
+
+            result.pressure = convertToArabicNumerals(tempObj.pressure.toString()) + " هكتوبسكال"
+            result.humidity = convertToArabicNumerals(tempObj.humidity.toString()) + " %"
+            result.desc = tempObj.descArabic
+
+            // Temperature conversion and rounding
+            when (tempUnit) {
+                "celsius" -> {
+                    result.temp = convertToArabicNumerals(tempObj.temp.roundToInt().toString()) + " س°"
+                    result.maxTemp = convertToArabicNumerals(tempObj.maxTemp.roundToInt().toString()) + " س°"
+                    result.minTemp = convertToArabicNumerals(tempObj.minTemp.roundToInt().toString()) + " س°"
                 }
-
-                // Convert based on the requested unit
-                val newTemp = when (tempUnit) {
-                    "celsius" -> {
-                        // No conversion needed
-                        "$finalTempValue س°"
-                    }
-                    "kelvin" -> {
-                        if (originalUnit == "س") {
-                            // Convert from Celsius to Kelvin
-                            val kelvinValue = celsiusToKelvin(finalTempValue).roundToInt()
-                            "$kelvinValue ك°"
-                        } else if (originalUnit == "ك") {
-                            // No conversion needed, just output in Arabic Kelvin
-                            "$finalTempValue ك°"
-                        } else {
-                            // Convert from Fahrenheit to Celsius first, then to Kelvin
-                            val celsiusValue = fahrenheitToCelsius(finalTempValue)
-                            val kelvinValue = celsiusToKelvin(celsiusValue).roundToInt()
-                            "$kelvinValue ك°"
-                        }
-                    }
-                    "fahrenheit" -> {
-                        if (originalUnit == "س") {
-                            // Convert from Celsius to Fahrenheit
-                            val fahrenheitValue = celsiusToFahrenheit(finalTempValue).roundToInt()
-                            "$fahrenheitValue ف°"
-                        } else if (originalUnit == "ك") {
-                            // Convert from Kelvin to Celsius, then to Fahrenheit
-                            val celsiusValue = kelvinToCelsius(finalTempValue)
-                            val fahrenheitValue = celsiusToFahrenheit(celsiusValue).roundToInt()
-                            "$fahrenheitValue ف°"
-                        } else {
-                            // No conversion needed, just output in Arabic Fahrenheit
-                            "$finalTempValue ف°"
-                        }
-                    }
-                    else -> forecast.temp // Default case if the unit is unknown
+                "kelvin" -> {
+                    result.temp = convertToArabicNumerals(celsiusToKelvin(tempObj.temp).roundToInt().toString()) + " ك°"
+                    result.maxTemp = convertToArabicNumerals(celsiusToKelvin(tempObj.maxTemp).roundToInt().toString()) + " ك°"
+                    result.minTemp = convertToArabicNumerals(celsiusToKelvin(tempObj.minTemp).roundToInt().toString()) + " ك°"
                 }
-
-                // Return the ForecastFinal object for Arabic
-                ForecastFinal(
-                    temp = newTemp,
-                    dt_txt = forecast.dt_txt,
-                    icon = forecast.icon
-                )
-
-            } else {
-                // English language logic
-                val lastChar = tempString.lastOrNull()
-
-                when (lastChar) {
-                    'C', 'c' -> {
-                        originalUnit = "C"
-                        finalTempValue = tempString.substringBeforeLast("C", "").toDoubleOrNull() ?: 0.0
-                    }
-                    'K', 'k' -> {
-                        originalUnit = "K"
-                        finalTempValue = tempString.substringBeforeLast("K", "").toDoubleOrNull() ?: 0.0
-                    }
-                    'F', 'f' -> {
-                        originalUnit = "F"
-                        finalTempValue = tempString.substringBeforeLast("F", "").toDoubleOrNull() ?: 0.0
-                    }
+                "fahrenheit" -> {
+                    result.temp = convertToArabicNumerals(celsiusToFahrenheit(tempObj.temp).roundToInt().toString()) + " ف°"
+                    result.maxTemp = convertToArabicNumerals(celsiusToFahrenheit(tempObj.maxTemp).roundToInt().toString()) + " ف°"
+                    result.minTemp = convertToArabicNumerals(celsiusToFahrenheit(tempObj.minTemp).roundToInt().toString()) + " ف°"
                 }
+            }
 
-                // Convert based on the requested unit
-                val newTemp = when (tempUnit) {
-                    "celsius" -> {
-                        "$finalTempValue °C"
-                    }
-                    "kelvin" -> {
-                        if (originalUnit == "C") {
-                            // No conversion needed
-                            "$finalTempValue °K"
-                        } else if (originalUnit == "K") {
-                            // No conversion needed, just output in English Kelvin
-                            "$finalTempValue °K"
-                        } else {
-                            // Convert from Fahrenheit to Celsius, then to Kelvin
-                            val celsiusValue = fahrenheitToCelsius(finalTempValue)
-                            val kelvinValue = celsiusToKelvin(celsiusValue).roundToInt()
-                            "$kelvinValue °K"
-                        }
-                    }
-                    "fahrenheit" -> {
-                        if (originalUnit == "C") {
-                            // Convert from Celsius to Fahrenheit
-                            val fahrenheitValue = celsiusToFahrenheit(finalTempValue).roundToInt()
-                            "$fahrenheitValue °F"
-                        } else if (originalUnit == "K") {
-                            // Convert from Kelvin to Celsius, then to Fahrenheit
-                            val celsiusValue = kelvinToCelsius(finalTempValue)
-                            val fahrenheitValue = celsiusToFahrenheit(celsiusValue).roundToInt()
-                            "$fahrenheitValue °F"
-                        } else {
-                            // No conversion needed, just output in English Fahrenheit
-                            "$finalTempValue °F"
-                        }
-                    }
-                    else -> forecast.temp // Default case if the unit is unknown
+            // Wind speed conversion and rounding
+            result.windSpeed = when (windUnit) {
+                "mile_hour" -> {
+                    windUnitSymbol = "ميل/س"
+                    convertToArabicNumerals(metersPerSecondToMilesPerHour(tempObj.windSpeed).roundToInt().toString()) + " " + windUnitSymbol
                 }
+                "meter_sec" -> {
+                    windUnitSymbol = "م/ث"
+                    convertToArabicNumerals(tempObj.windSpeed.roundToInt().toString()) + " " + windUnitSymbol
+                }
+                else -> tempObj.windSpeed.toString()  // Default case
+            }
 
-                // Return the ForecastFinal object for English
-                ForecastFinal(
-                    temp = newTemp,
-                    dt_txt = forecast.dt_txt,
-                    icon = forecast.icon
-                )
+        } else  {
+            result.desc = tempObj.descEnglish
+            // English language setup
+            result.pressure = tempObj.pressure.toString() + " hpa"
+            result.humidity = tempObj.humidity.toString() + " %"
+
+            when (tempUnit) {
+                "celsius" -> {
+                    result.temp = tempObj.temp.roundToInt().toString() + " c°"
+                    result.maxTemp = tempObj.maxTemp.roundToInt().toString() + " c°"
+                    result.minTemp = tempObj.minTemp.roundToInt().toString() + " c°"
+                }
+                "kelvin" -> {
+                    result.temp = celsiusToKelvin(tempObj.temp).roundToInt().toString() + " k°"
+                    result.maxTemp = celsiusToKelvin(tempObj.maxTemp).roundToInt().toString() + " k°"
+                    result.minTemp = celsiusToKelvin(tempObj.minTemp).roundToInt().toString() + " k°"
+                }
+                "fahrenheit" -> {
+                    result.temp = celsiusToFahrenheit(tempObj.temp).roundToInt().toString() + " f°"
+                    result.maxTemp = celsiusToFahrenheit(tempObj.maxTemp).roundToInt().toString() + " f°"
+                    result.minTemp = celsiusToFahrenheit(tempObj.minTemp).roundToInt().toString() + " f°"
+                }
+            }
+
+            // Wind speed conversion and rounding
+            result.windSpeed = when (windUnit) {
+                "mile_hour" -> {
+                    windUnitSymbol = " mile/h"
+                    metersPerSecondToMilesPerHour(tempObj.windSpeed).roundToInt().toString() + windUnitSymbol
+                }
+                "meter_sec" -> {
+                    tempObj.windSpeed.roundToInt().toString() + " m/s"
+                }
+                else -> tempObj.windSpeed.toString()
             }
         }
+
+
+        return result
     }
+
 
 
 
@@ -279,6 +242,46 @@ object  Conversions {
     private fun kelvinToCelsius(kelvin: Double): Double {
         return kelvin - 273.15
     }
+
+    fun convertWeatherDbListToFullWeatherDetailsList(
+        weatherDbList: List<WeatherDb>,
+        tempUnit: String,
+        windUnit:String,
+        language: String,
+        geocoder: Geocoder
+
+    ): List<FullWeatherDetails>{
+        val fullWeatherDetailsList = mutableListOf<FullWeatherDetails>()
+        for (weatherDb in weatherDbList) {
+
+            val weatherForecast = convertWeatherDB(weatherDb.weatherForecast,tempUnit,language)
+            val fullWeather = convertCurrentWeatherDB(weatherDb, tempUnit, windUnit, language,geocoder)
+            fullWeather.weatherForecast = weatherForecast
+
+            if(language=="ar")
+            {
+                fullWeather.cityName=weatherDb.cityNameArabic
+                fullWeather.country=weatherDb.countryArabic
+                fullWeather.address=weatherDb.addressArabic
+
+            }
+            else if(language=="en")
+            {
+                fullWeather.cityName=weatherDb.cityNameEnglish
+                fullWeather.country=weatherDb.countryEnglish
+                fullWeather.address=weatherDb.addressEnglish
+            }
+            else
+            {
+                fullWeather.cityName=weatherDb.cityNameRomanian
+                fullWeather.country=weatherDb.countryRomanion
+                fullWeather.cityName=weatherDb.addressRomanion
+            }
+            fullWeatherDetailsList.add(fullWeather)
+        }
+        return fullWeatherDetailsList
+    }
+
     fun convert5Days3HoursObj(tempObj: Root, tempUnit: String, language: String): List<ForecastFinal> {
         val result: Root = tempObj
         val finalList = mutableListOf<ForecastFinal>()
@@ -359,4 +362,54 @@ object  Conversions {
 
         return finalList
     }
+
+    private fun convertWeatherDB(tempObj: List<ForecastDB>, tempUnit: String, language: String): List<ForecastFinal> {
+        val result: List<ForecastDB> = tempObj
+        val finalList = mutableListOf<ForecastFinal>()
+
+        for (i in result.indices) {
+
+            val forecast = ForecastFinal().apply {
+                temp = when {
+                    language == "ar" && tempUnit == "celsius" -> {
+                        Conversions.convertToArabicNumerals(result[i].temp.roundToInt().toString()) + "س°"
+                    }
+                    language == "ar" && tempUnit == "kelvin" -> {
+                        Conversions.convertToArabicNumerals(celsiusToKelvin(result[i].temp).roundToInt().toString()) + "ك°"
+                    }
+                    language == "ar" && tempUnit == "fahrenheit" -> {
+                        Conversions.convertToArabicNumerals(celsiusToFahrenheit(result[i].temp).roundToInt().toString()) + "ف°"
+                    }
+                    tempUnit == "celsius" -> {
+                        result[i].temp.roundToInt().toString() + " °C"
+                    }
+                    tempUnit == "kelvin" -> {
+                        celsiusToKelvin(result[i].temp).roundToInt().toString() + " °K"
+                    }
+                    tempUnit == "fahrenheit" -> {
+                        celsiusToFahrenheit(result[i].temp).roundToInt().toString() + " °F"
+                    }
+                    else -> "Unknown"
+                }
+                icon = result[i].icon
+                dt_txt = result[i].dt_txt
+            }
+            finalList.add(forecast)
+        }
+        return finalList
+    }
+
+    private fun translateCityName(latitude: Double, longitude: Double, lang: String, geocoder: Geocoder): String {
+        return try {
+            val locale = Locale(lang)
+
+            val addresses = geocoder.getFromLocation(latitude, longitude, 1)
+            addresses?.firstOrNull()?.locality ?: "Unknown City"
+        } catch (e: Exception) {
+            e.printStackTrace()
+            "Unknown City"
+        }
+    }
+
+
 }

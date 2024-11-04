@@ -15,6 +15,15 @@
     <string name="locationsrc">مصدر الموقع</string>
     <string name="windspeedunit">وحدة سرعة الرياح</string>
     <string name="setting">الإعدادات</string>
+    <string name="to">Open Map</string>
+    <string name="from">حدد الوقت</string>
+    <string name="search">إبحث بأسم المدينة</string>
+    <string name="notification">إشعارات</string>
+    <string name="add">أضافة</string>
+    <string name="alarm">منبة</string>
+    <string name="nottime">وقت التنبية </string>
+    <string name="notifyby">تنبية من خلالي\n</string>
+    <string name="notfor">تنبية لأجل</string>
 
     <string-array name="language_entries">
         <item>العربية</item>

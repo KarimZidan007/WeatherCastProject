@@ -15,6 +15,15 @@
     <string name="locationsrc">Sursa locației</string>
     <string name="windspeedunit">Unitatea de viteză a vântului</string>
     <string name="setting">Setări</string>
+    <string name="to">To</string>
+    <string name="from">From</string>
+    <string name="search">Search By City Name</string>
+    <string name="notification">Notification</string>
+    <string name="add">Add</string>
+    <string name="alarm">Alarm</string>
+    <string name="nottime">Timpul notificării</string>
+    <string name="notifyby">Notifică-mă prin\n</string>
+    <string name="notfor">Notificare pentru</string>
 
     <string-array name="language_entries">
         <item>Română</item>

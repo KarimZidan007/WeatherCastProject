@@ -2,12 +2,12 @@ package com.example.weatherproject.navbar.ui.home.view
 
 import ForecastRemoteDataSource
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.location.Geocoder
 import android.location.Location
 import android.os.Bundle
 import android.util.Log
@@ -16,6 +16,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewOutlineProvider
 import android.view.WindowManager
+import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -23,20 +24,19 @@ import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mvvm_demo.model.datasources.RemoteDataSrcImplementation
-import com.example.mvvm_demo.model.repository.RemoteRepository
+import com.example.weatherproject.model.repository.remote.RemoteRepository
 import com.example.weatherproject.MapActivity
 import com.example.weatherproject.R
 import com.example.weatherproject.databinding.FragmentHomeBinding
 import com.example.weatherproject.model.ApiState
-import com.example.weatherproject.model.Helpers.Conversions
+import com.example.weatherproject.model.Helpers.UserStates
 import com.example.weatherproject.model.WeatherApiState
 import com.example.weatherproject.model.pojos.ForecastFinal
 import com.example.weatherproject.model.pojos.FullWeatherDetails
 import com.example.weatherproject.model.pojos.WeatherFinal
-import com.example.weatherproject.model.repository.SettingsRepository
+import com.example.weatherproject.model.repository.setting.SettingsRepository
 import com.example.weatherproject.navbar.ui.home.HomeViewModel
 import com.example.weatherproject.navbar.ui.home.MyWeather3hours5daysFactory
-import com.example.weatherproject.navbar.ui.home.OnFragmentInteractionListener
 import com.example.weatherproject.navbar.ui.settings.SettingsFactory
 import com.example.weatherproject.navbar.ui.settings.SettingsViewModel
 import com.github.matteobattilana.weather.PrecipType
@@ -52,7 +52,6 @@ import java.util.Date
 import java.util.Locale
 import java.util.Timer
 import java.util.TimerTask
-import kotlin.math.roundToInt
 
 class HomeFragment : Fragment() {
     private var LOCATION_PERMISSION_REQUEST_CODE = 5005
@@ -72,7 +71,6 @@ class HomeFragment : Fragment() {
     private val calendar by lazy { Calendar.getInstance() }
     private lateinit var location: Location
     private lateinit var language: String
-    private var listener: OnFragmentInteractionListener? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -93,6 +91,10 @@ class HomeFragment : Fragment() {
             progressBar.visibility = View.VISIBLE
             tempo.visibility = View.INVISIBLE
             detailCard.visibility = View.INVISIBLE
+            blueView.visibility = View.INVISIBLE
+            blueViewThree.visibility = View.INVISIBLE
+            weeklydetails.visibility = View.INVISIBLE
+            citytxt.visibility=View.INVISIBLE
         }
 
         initializeComponents()
@@ -150,7 +152,6 @@ class HomeFragment : Fragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-            listener = context as? OnFragmentInteractionListener
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -160,11 +161,28 @@ class HomeFragment : Fragment() {
         if (isFromFavourites) {
             val forecast: FullWeatherDetails = args?.getParcelable("favCity") ?: FullWeatherDetails()
             updateWeatherUI(convertToWeatherFinal(forecast))
-                updateForecastUI(Conversions.convertForecastList(forecast.weatherForecast,settingsViewModel.getTemperatureBasedPreference(),settingsViewModel.getLanguagueBasedOnPreference()))
-
+            updateForecastUI(forecast.weatherForecast)
 
         } else {
-            observeWeatherData()
+            if(UserStates.checkConnectionState(requireContext()))
+            {
+                binding.apply {
+                tempo.visibility = View.VISIBLE
+                detailCard.visibility = View.VISIBLE
+                blueView.visibility = View.VISIBLE
+                blueViewThree.visibility = View.VISIBLE
+                weeklydetails.visibility = View.VISIBLE
+                    citytxt.visibility=View.VISIBLE
+                }
+                observeWeatherData()
+            }
+            else
+            {
+                binding.progressBar.visibility = View.INVISIBLE
+                binding.bgimage.setImageResource(R.drawable.connection)
+                binding.bgimage.scaleType=ImageView.ScaleType.CENTER_CROP
+
+            }
         }
 
     }
@@ -203,7 +221,7 @@ class HomeFragment : Fragment() {
         return when (icon.dropLast(1)) {
             "01" -> {
                 initWeatherView(PrecipType.CLEAR)
-                R.drawable.clearsky
+                R.drawable.clear
             }
 
             "02", "03", "04" -> {
@@ -273,32 +291,31 @@ class HomeFragment : Fragment() {
         if (ContextCompat.checkSelfPermission(
                 requireContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION
-            )
-            != PackageManager.PERMISSION_GRANTED
-        ) {
+            ) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(
                 arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
                 LOCATION_PERMISSION_REQUEST_CODE
             )
         } else {
-            fusedClient.lastLocation.addOnSuccessListener {
-                homeViewModel.getWeatherDetails5days3hours(
-                    (it ?: Location("place").apply { latitude = 30.0;latitude = 30.0 }),
-                    settingsViewModel.getLanguagueBasedOnPreference(),
-                    settingsViewModel.getTemperatureBasedPreference()
-                )
-                homeViewModel.getCurrentWeather(
-                    (it ?: Location("place").apply {
-                        latitude = 30.0;latitude = 30.0
-                    }),
-                    settingsViewModel.getLanguagueBasedOnPreference(),
-                    settingsViewModel.getTemperatureBasedPreference(),
-                    settingsViewModel.getWindSpeedBasedPreference()
-                )
+            fusedClient.lastLocation.addOnSuccessListener { location ->
+                if (isAdded) {  // Ensure the fragment is added to the activity
+                    homeViewModel.getWeatherDetails5days3hours(
+                        location ?: Location("place").apply { latitude = 30.0; longitude = 30.0 },
+                        settingsViewModel.getLanguagueBasedOnPreference(),
+                        settingsViewModel.getTemperatureBasedPreference()
+                    )
+                    homeViewModel.getCurrentWeather(
+                        location ?: Location("place").apply { latitude = 30.0; longitude = 30.0 },
+                        settingsViewModel.getLanguagueBasedOnPreference(),
+                        settingsViewModel.getTemperatureBasedPreference(),
+                        settingsViewModel.getWindSpeedBasedPreference(),
+                    )
+                }
+            }.addOnFailureListener { exception ->
+                Log.e("HomeFragment", "Failed to get location", exception)
             }
         }
     }
-
     override fun onRequestPermissionsResult(
         requestCode: Int, permissions: Array<String>, grantResults: IntArray
     ) {
@@ -320,8 +337,23 @@ class HomeFragment : Fragment() {
     }
 
     fun openMap() {
-        var intent: Intent = Intent(requireContext(), MapActivity::class.java)
-        startActivityForResult(intent, 100)
+        if(UserStates.checkConnectionState(requireContext()))
+        {
+            var intent: Intent = Intent(requireContext(), MapActivity::class.java)
+            startActivityForResult(intent, 100)
+        }
+        else
+        {
+            view?.let {
+                Snackbar.make(it, "No Internet Connection", Snackbar.LENGTH_LONG)
+                    .setAction("Retry") {
+                        openMap() // Retry opening the map
+                    }
+                    .show()
+            }
+
+        }
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -338,11 +370,9 @@ class HomeFragment : Fragment() {
                 settingsViewModel.lastLocation.value,
                 settingsViewModel.getLanguagueBasedOnPreference(),
                 settingsViewModel.getTemperatureBasedPreference(),
-                settingsViewModel.getWindSpeedBasedPreference()
+                settingsViewModel.getWindSpeedBasedPreference(),
             )
         }
-
-
     }
 
     private fun displayWeatherForLocation(location: Location) {
@@ -355,7 +385,8 @@ class HomeFragment : Fragment() {
             location,
             settingsViewModel.getLanguagueBasedOnPreference(),
             settingsViewModel.getTemperatureBasedPreference(),
-            settingsViewModel.getWindSpeedBasedPreference()
+            settingsViewModel.getWindSpeedBasedPreference(),
+
         )
     }
 
@@ -374,7 +405,7 @@ class HomeFragment : Fragment() {
             MinTempText.text = weather.minTemp
             humidityUnit.text = weather.humidity
 
-            val drawable = if (isNightNow()) R.drawable.cloud else setDynamicWallper(weather.icon)
+            val drawable = if (isNightNow()) R.drawable.night else setDynamicWallper(weather.icon)
             bgimage.setImageResource(drawable)
             setRainSnowEffect(weather.icon)
         }
@@ -389,8 +420,6 @@ class HomeFragment : Fragment() {
                     LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
                 adapter = RecyclerAdapter
             }
-
-
         }
 
     }
@@ -403,7 +432,6 @@ class HomeFragment : Fragment() {
                 fusedClient = LocationServices.getFusedLocationProviderClient(requireContext())
                 checkLocationPermissions()
             }
-
             "map" -> {
                 homeViewModel.getWeatherDetails5days3hours(
                     settingsViewModel.lastLocation.value,
@@ -414,7 +442,7 @@ class HomeFragment : Fragment() {
                     settingsViewModel.lastLocation.value,
                     settingsViewModel.getLanguagueBasedOnPreference(),
                     settingsViewModel.getTemperatureBasedPreference(),
-                    settingsViewModel.getWindSpeedBasedPreference()
+                    settingsViewModel.getWindSpeedBasedPreference(),
                 )
             }
         }
@@ -457,6 +485,7 @@ class HomeFragment : Fragment() {
             }
         }
     }
+
     private fun observeWeatherData() {
         lifecycleScope.launch {
             homeViewModel.currentWeather.collectLatest { state ->

@@ -3,8 +3,11 @@ package com.example.weatherproject.navbar.ui.favourite.view
 import ForecastRemoteDataSource
 import LocalDataSrcImplementation
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.drawable.Drawable
+import android.location.Geocoder
 import android.location.Location
 import android.os.Bundle
 import android.util.Log
@@ -13,34 +16,33 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.labone.database.DAO
-import com.example.labone.database.RoomDataBase
 import com.example.mvvm_demo.model.datasources.RemoteDataSrcImplementation
-import com.example.mvvm_demo.model.repository.RemoteRepository
+import com.example.weatherproject.model.repository.remote.RemoteRepository
 import com.example.weatherproject.MapActivity
-import com.example.weatherproject.R
-import com.example.weatherproject.database.Weather.WeatherDAO
-import com.example.weatherproject.database.Weather.WeatherRoomDataBase
 import com.example.weatherproject.database.forecast.ForecastDAO
 import com.example.weatherproject.database.forecast.FullForecastRoomDataBase
 import com.example.weatherproject.databinding.FragmentFavouriteBinding
-import com.example.weatherproject.model.pojos.FavCity
+import com.example.weatherproject.model.pojos.DataBaseState
 import com.example.weatherproject.model.pojos.FullWeatherDetails
-import com.example.weatherproject.model.repository.LocalRepository
-import com.example.weatherproject.model.repository.SettingsRepository
+import com.example.weatherproject.model.pojos.WeatherDb
+import com.example.weatherproject.model.repository.local.LocalRepository
+import com.example.weatherproject.model.repository.setting.SettingsRepository
 import com.example.weatherproject.navbar.ui.favourite.viewmodel.FavouriteViewModel
 import com.example.weatherproject.navbar.ui.favourite.viewmodel.MyLocalFavCitiesFactory
 import com.example.weatherproject.navbar.ui.home.HomeViewModel
-import com.example.weatherproject.navbar.ui.home.OnFragmentInteractionListener
 import com.example.weatherproject.navbar.ui.home.view.HomeFragment
 import com.example.weatherproject.navbar.ui.settings.SettingsFactory
 import com.example.weatherproject.navbar.ui.settings.SettingsViewModel
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import java.util.Locale
 
-class FavouriteFragment : Fragment(), OnFragmentInteractionListener {
+class FavouriteFragment : Fragment() {
 
     private var _binding: FragmentFavouriteBinding? = null
     private lateinit var homeViewModel: HomeViewModel
@@ -50,8 +52,7 @@ class FavouriteFragment : Fragment(), OnFragmentInteractionListener {
     private lateinit var localSrc: LocalDataSrcImplementation
     private lateinit var remoteSrc: RemoteDataSrcImplementation
     private lateinit var retroSrc: ForecastRemoteDataSource
-    lateinit var favDao: DAO
-    private lateinit var favWeatherDao: WeatherDAO
+ //   private lateinit var favWeatherDao: WeatherDAO
     private lateinit var favForecastDao: ForecastDAO
     private val binding get() = _binding!!
     private lateinit var recyclerAdapter: FavAdapter
@@ -60,6 +61,9 @@ class FavouriteFragment : Fragment(), OnFragmentInteractionListener {
     private lateinit var settingsViewModel: SettingsViewModel
     private lateinit var language: String
     private lateinit var settingRepository: SettingsRepository
+    private var contentBG: Drawable? = null
+    private var needBlur: Boolean = true
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -78,11 +82,6 @@ class FavouriteFragment : Fragment(), OnFragmentInteractionListener {
             openMap()
         }
 
-        favouriteViewModel.cityFavList.observe(requireActivity()) { cityFavList ->
-            if (cityFavList != null) {
-                recyclerAdapter.submitList(cityFavList)
-            }
-        }
         return root
     }
 
@@ -93,9 +92,29 @@ class FavouriteFragment : Fragment(), OnFragmentInteractionListener {
                 hideBackUIComponents()
 
             } else {
+                // Hide UI components if needed
+               // setupBlurViews()
                 showBackUIComponents()
+
             }
+
          }
+        lifecycleScope.launch {
+            favouriteViewModel.readycityFavList.collectLatest {state ->
+                when (state) {
+                    is DataBaseState.Failed -> {
+
+                    }
+                    DataBaseState.Loading -> {
+
+                    }
+                    is DataBaseState.Success -> {
+                        recyclerAdapter.submitList(state.weatherDetails)
+                    }
+                }
+
+            }
+        }
     }
     override fun onResume() {
         super.onResume()
@@ -125,11 +144,11 @@ class FavouriteFragment : Fragment(), OnFragmentInteractionListener {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 100 && resultCode == Activity.RESULT_OK) {
-            val favCity = data?.getParcelableExtra<FullWeatherDetails>("fav")
+            val favCity = data?.getParcelableExtra<WeatherDb>("fav")
             if (favCity != null) {
                 val location = Location("customProvider")
-                location.latitude = favCity.latitude
-                location.longitude = favCity.longitude
+                location.latitude = favCity.lat_
+                location.longitude = favCity.lng_
                 favouriteViewModel.saveCityForecastWeatherDetails(
                     location,
                     settingsViewModel.getLanguagueBasedOnPreference(),
@@ -142,7 +161,7 @@ class FavouriteFragment : Fragment(), OnFragmentInteractionListener {
     }
 
     private fun setupRecyclerView() {
-        recyclerAdapter = FavAdapter() {
+        recyclerAdapter = FavAdapter {
             openHomeFragment(it)
 
         }
@@ -160,18 +179,16 @@ class FavouriteFragment : Fragment(), OnFragmentInteractionListener {
         binding.favCities.visibility=View.INVISIBLE
         binding.imageView.visibility=View.INVISIBLE
         val homeFragment = HomeFragment().apply {
-
             arguments = Bundle().apply {
                 putParcelable("favCity", favCity)
+                Log.i("ZIY", "openHomeFragment: "+favCity.temp+favCity.desc)
                 putBoolean("isFromFavourites", true)
             }
         }
-
         childFragmentManager.beginTransaction()
             .add(binding.homeFragmentContainer.id, homeFragment)
             .addToBackStack("HomeFragmentTransaction")
             .commit()
-
     }
     private fun setupSwipeToDelete() {
         val itemTouchHelperCallback = object :
@@ -187,9 +204,21 @@ class FavouriteFragment : Fragment(), OnFragmentInteractionListener {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val position = viewHolder.adapterPosition
                 val city = recyclerAdapter.currentList[position]
-                favouriteViewModel.delFavCityWeatherDetails(city)
+                val builder = AlertDialog.Builder(context)
+                builder.setMessage("If you proceed, you will remove ${city.cityName}")
+                builder.setPositiveButton("Proceed") { dialog, _ ->
+                    favouriteViewModel.delFavCityWeatherDetails(city.latitude,city.longitude)
+                }
+                builder.setNegativeButton("Cancel") { dialog, _ ->
+                    dialog.cancel()
+                }
+                val alertDialog = builder.create()
+                alertDialog.show()
             }
         }
+
+
+
         val itemTouchHelper = ItemTouchHelper(itemTouchHelperCallback)
         itemTouchHelper.attachToRecyclerView(recyclerFav)
     }
@@ -197,13 +226,11 @@ class FavouriteFragment : Fragment(), OnFragmentInteractionListener {
         retroSrc = ForecastRemoteDataSource()
         remoteSrc = RemoteDataSrcImplementation(retroSrc)
         remoteRepository = RemoteRepository(remoteSrc)
-        favDao = RoomDataBase.getInstance(requireContext()).getFavCitiesDao()
-        favWeatherDao = WeatherRoomDataBase.getInstance(requireContext()).getFavCitiesWeatherDao()
         favForecastDao = FullForecastRoomDataBase.getInstance(requireContext()).getFavCitiesFullForecastDao()
-        localSrc = LocalDataSrcImplementation(favDao,favWeatherDao,favForecastDao)
+        localSrc = LocalDataSrcImplementation(null,favForecastDao)
         localRepository = LocalRepository(localSrc)
         favouriteViewModel =
-            ViewModelProvider(this, MyLocalFavCitiesFactory(remoteRepository, localRepository)).get(
+            ViewModelProvider(this, MyLocalFavCitiesFactory(remoteRepository, localRepository,requireContext())).get(
                 FavouriteViewModel::class.java
             )
 
@@ -214,7 +241,9 @@ class FavouriteFragment : Fragment(), OnFragmentInteractionListener {
             SettingsViewModel::class.java
         )
         language = settingsViewModel.getLanguagueBasedOnPreference()
-
+        favouriteViewModel.getLocalFavForecastCities(language,settingsViewModel.getTemperatureBasedPreference(),settingsViewModel.getWindSpeedBasedPreference(),
+            Geocoder(requireContext(), Locale.ENGLISH)
+        )
     }
     fun showBackUIComponents() {
         binding.favCities.visibility = View.VISIBLE
@@ -225,10 +254,6 @@ class FavouriteFragment : Fragment(), OnFragmentInteractionListener {
         binding.favCities.visibility = View.GONE
         binding.imageView.visibility = View.GONE
         binding.homeFragmentContainer.visibility = View.VISIBLE
-    }
-    override fun onHomeFragmentDestroyed() {
-        Log.i("HomeFragment", "onHomeFragmentDestroyed: ")
-        showBackUIComponents()
     }
 
 }

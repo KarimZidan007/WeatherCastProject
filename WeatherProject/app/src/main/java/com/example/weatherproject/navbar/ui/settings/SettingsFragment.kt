@@ -5,16 +5,14 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.location.Location
 import android.os.Bundle
-import android.util.Log
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.preference.ListPreference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
-import com.example.weatherproject.ContextUtils
 import com.example.weatherproject.MapActivity
 import com.example.weatherproject.R
-import com.example.weatherproject.model.repository.SettingsRepository
-import java.util.Locale
+import com.example.weatherproject.model.repository.setting.SettingsRepository
 
 class SettingsFragment :  PreferenceFragmentCompat() {
     private lateinit var settingsViewModel: SettingsViewModel
@@ -24,6 +22,7 @@ class SettingsFragment :  PreferenceFragmentCompat() {
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey)
+        view?.setBackgroundColor(ContextCompat.getColor(requireContext(),R.color.black))
          sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
          settingsRepository = SettingsRepository(sharedPreferences)
         var factory = SettingsFactory(settingsRepository)

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="CustomPreferenceStyle" parent="Preference">
+        <item name="android:background">@drawable/cloud</item>
+    </style>
+</resources>

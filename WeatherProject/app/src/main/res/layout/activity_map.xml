@@ -17,63 +17,61 @@
 
     <LinearLayout
         android:id="@+id/searchlayout"
-        android:paddingTop="16dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+    android:orientation="vertical">
 
-        <SearchView
-            android:id="@+id/search_bar"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:hint="Enter place name"
-            android:background="@android:color/white"
-            />
-
-
-    </LinearLayout>
-
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/map"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/searchlayout"
-        android:layout_marginTop="7dp" />
-
-    <eightbitlab.com.blurview.BlurView
-        android:id="@+id/card_view"
+    <SearchView
+        android:id="@+id/search_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        app:blurOverlayColor="#10ffffff"
-        android:layout_margin="16dp"
-        android:padding="16dp"
-        android:elevation="4dp"
-        tools:visibility="visible"
-        android:backgroundTint="@color/white">
+    android:background="@android:color/white"
+    android:hint="Enter place name"
+    android:padding="0dp" />
+</LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+<androidx.fragment.app.FragmentContainerView
+android:id="@+id/map"
+android:name="com.google.android.gms.maps.SupportMapFragment"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:layout_below="@id/searchlayout"
+android:layout_marginTop="0dp" />
 
-            <TextView
-                android:id="@+id/tv_selected_location"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Selected Location"
-                android:textAlignment="center"
-                android:textColor="@android:color/black"
-                android:textSize="16sp" />
+<androidx.cardview.widget.CardView
+android:id="@+id/card_view"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:layout_alignParentBottom="true"
+app:cardBackgroundColor="#222222"
+app:cardCornerRadius="8dp"
+app:cardElevation="4dp"
+android:layout_margin="16dp"
+android:padding="16dp">
 
-            <Button
-                android:id="@+id/btn_select_location"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="Select Location" />
-        </LinearLayout>
-    </eightbitlab.com.blurview.BlurView>
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
-</RelativeLayout>
+    <TextView
+        android:id="@+id/tv_selected_location"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Selected Location"
+        android:textAlignment="center"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        android:textSize="20sp" />
+
+    <Button
+        android:id="@+id/btn_select_location"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:backgroundTint="@color/black"
+        android:text="Select Location" />
+</LinearLayout>
+</androidx.cardview.widget.CardView>
+
+    </RelativeLayout>

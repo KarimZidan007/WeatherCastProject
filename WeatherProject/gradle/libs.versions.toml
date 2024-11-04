@@ -16,6 +16,7 @@ navigationUiKtx = "2.8.2"
 glide = "4.14.2"
 preference = "1.2.1"
 
+
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }

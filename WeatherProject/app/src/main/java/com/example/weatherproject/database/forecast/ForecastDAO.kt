@@ -5,8 +5,8 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.example.weatherproject.model.pojos.ForecastFinal
 import com.example.weatherproject.model.pojos.FullWeatherDetails
+import com.example.weatherproject.model.pojos.WeatherDb
 import kotlinx.coroutines.flow.Flow
 
 
@@ -14,15 +14,15 @@ import kotlinx.coroutines.flow.Flow
 interface ForecastDAO {
 
     @Query("SELECT * FROM favforecast_table ")
-    fun getAllFavCityForecast(): Flow<List<FullWeatherDetails>>
+     fun getAllFavCityForecast(): Flow<List<WeatherDb>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertFavFullCityForecast(city: FullWeatherDetails): Long
+    suspend fun insertFavFullCityForecast(city: WeatherDb): Long
 
     @Update
-    suspend fun updateFavFullCityForecast(city: FullWeatherDetails)
+    suspend fun updateFavFullCityForecast(city: WeatherDb)
 
-    @Delete
-    suspend fun deleteFavFullCityForecast(city: FullWeatherDetails): Int
+    @Query("DELETE FROM favforecast_table WHERE lat_ = :lat AND lng_ = :lon")
+    suspend fun deleteFavFullCityForecast(lat: Double, lon: Double): Int
 
 }

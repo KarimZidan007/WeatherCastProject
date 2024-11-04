@@ -14,8 +14,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceManager
-import com.example.weatherproject.model.pojos.FavCity
-import com.example.weatherproject.model.pojos.FullWeatherDetails
+import com.example.weatherproject.model.pojos.WeatherDb
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -37,7 +36,12 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var selectedLatLng: LatLng
     private lateinit var currentLocale: Locale
     private lateinit var sharedPreferences :SharedPreferences
-    private  var favCity:FullWeatherDetails= FullWeatherDetails()
+    private  var favCity:WeatherDb= WeatherDb()
+    private lateinit var cityName:String
+    private lateinit var firstLineAddress:String
+    private lateinit var countryName:String
+    private lateinit var tvSelectedLocation:TextView
+    private lateinit var btnSelectLocation:Button
     override fun attachBaseContext(newBase: Context) {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(newBase)
         val languageCode = sharedPreferences.getString("language_preference", "en") ?: "en"
@@ -51,8 +55,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         setContentView(R.layout.activity_map)
 
         Places.initialize(applicationContext, getString(R.string.google_maps_key))
-        val tvSelectedLocation = findViewById<TextView>(R.id.tv_selected_location)
-        val btnSelectLocation = findViewById<Button>(R.id.btn_select_location)
+         tvSelectedLocation = findViewById<TextView>(R.id.tv_selected_location)
+         btnSelectLocation = findViewById<Button>(R.id.btn_select_location)
 
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
@@ -60,14 +64,12 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
         val searchBar = findViewById<SearchView>(R.id.search_bar)
         btnSelectLocation.setOnClickListener {
-            if (favCity.address.isNullOrEmpty() || favCity.country.isNullOrEmpty() ||
-                favCity.latitude == 0.0 || favCity.longitude == 0.0) {
-                Toast.makeText(this, "Incomplete location data. Please select a valid location.", Toast.LENGTH_SHORT).show()
-            } else {
+            if (favCity.addressEnglish.isNullOrEmpty() || favCity.countryEnglish.isNullOrEmpty())
+                else {
                 val intent = Intent()
                 intent.putExtra("fav", favCity)
-                intent.putExtra("latitude", favCity.latitude)
-                intent.putExtra("longitude", favCity.longitude)
+                intent.putExtra("latitude", favCity.lat_)
+                intent.putExtra("longitude", favCity.lng_)
                 setResult(RESULT_OK, intent)
                 finish()
             }
@@ -119,52 +121,117 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun getCityNameFromCoordinates(latLng: LatLng) {
-        val geocoder = Geocoder(this, Locale.getDefault())
-        try {
-            val addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 5) // Increased number of results
-            if (addresses != null && addresses.isNotEmpty()) {
-                for (address in addresses) {
+        val locales = listOf(Locale("ar"), Locale("en")) // Arabic and English only
+        var favCityAddress = "No address found"
+        var favCityName = mutableMapOf<String, String?>()
+        var favAddress = mutableMapOf<String, String?>()
+        var favCountryNameMap = mutableMapOf<String, String?>()
+
+        for (locale in locales) {
+            val geocoder = Geocoder(this, locale)
+            try {
+                val addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
+
+                if (addresses != null && addresses.isNotEmpty()) {
+                    val address = addresses[0]
+
+                    // Get city name
                     val cityName = address.locality ?: address.adminArea ?: address.featureName
-                    val fullAddress = address.getAddressLine(0)
-                    val countryName = address.countryName
+                    favCityName[locale.language] = cityName
 
-                    if (!cityName.isNullOrEmpty() && !fullAddress.isNullOrEmpty() && !countryName.isNullOrEmpty() &&
-                        latLng.latitude != 0.0 && latLng.longitude != 0.0) {
-                        favCity.address = fullAddress
-                        favCity.country = countryName
-                        favCity.latitude = latLng.latitude
-                        favCity.longitude = latLng.longitude
+                    // Get country name
+                    favCountryNameMap[locale.language] = address.countryName
 
-                        Toast.makeText(this, "City: $cityName, Address: $fullAddress, Country: $countryName", Toast.LENGTH_SHORT).show()
-                        return // Exit once a valid address is found
-                    }
+                    // Get address line
+                    favAddress[locale.language] = address.getAddressLine(0)?.trim()
+
+                    // Update the general address if available
+                    favCityAddress = favAddress[locale.language] ?: favCityAddress
                 }
-                Toast.makeText(this, "Complete address or valid data not found, please try again.", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(this, "Unknown location, please try a different spot.", Toast.LENGTH_SHORT).show()
+            } catch (e: IOException) {
+                e.printStackTrace()
             }
-        } catch (e: IOException) {
-            e.printStackTrace()
-            Toast.makeText(this, "Failed to retrieve location details", Toast.LENGTH_SHORT).show()
+        }
+
+        // Set the city, country, and address for each language
+        favCity.addressArabic = favAddress["ar"] ?: "Unknown Address"
+        favCity.addressEnglish = favAddress["en"] ?: "Unknown Address"
+        favCity.addressRomanion = favAddress["en"] ?: "Unknown Address" // Set Romanian address to English
+
+        favCity.cityNameArabic = favCityName["ar"] ?: "Unknown City"
+        favCity.cityNameEnglish = favCityName["en"] ?: "Unknown City"
+        favCity.cityNameRomanian = favCityName["en"] ?: "Unknown City" // Set Romanian city name to English
+
+        favCity.countryArabic = favCountryNameMap["ar"] ?: "Unknown Country"
+        favCity.countryEnglish = favCountryNameMap["en"] ?: "Unknown Country"
+        favCity.countryRomanion = favCountryNameMap["en"] ?: "Unknown Country"
+
+        favCity.lat_ = latLng.latitude
+        favCity.lng_ = latLng.longitude
+
+        if (favCityName.isNotEmpty()) {
+            tvSelectedLocation.text = favCityAddress
+        } else {
+            // No valid address was found
+            Toast.makeText(this, "Complete address or valid data not found, please try again.", Toast.LENGTH_SHORT).show()
         }
     }
 
+
+
     private fun searchForLocation(placeName: String) {
-        val geocoder = Geocoder(this, Locale.getDefault())
+        val locales = listOf(Locale("ar"), Locale("en")) // Arabic and English only
+        val geocoder = Geocoder(this)
+        var favAddressMap = mutableMapOf<String, String?>() // To store addresses in different languages
+        var favCityName = mutableMapOf<String, String?>()
+        var favCountryNameMap = mutableMapOf<String, String?>()
+
         try {
             // Get a list of addresses matching the place name
             val addressList = geocoder.getFromLocationName(placeName, 5) // Increased the limit to find more options
             if (addressList != null && addressList.isNotEmpty()) {
-                // Find the first address with a locality or fallback to the first address found
-                val preferredAddress = addressList.find { it.locality != null } ?: addressList[0]
+                // Select the preferred address with a locality
+                val preferredAddress = addressList.firstOrNull { it.locality != null } ?: addressList[0]
 
-                // Log the preferred address for debugging
+                // Loop through the locales to get addresses in each language
+                for (locale in locales) {
+                    // Create a geocoder for the current locale
+                    val localizedGeocoder = Geocoder(this, locale)
+                    val localizedAddress = localizedGeocoder.getFromLocation(preferredAddress.latitude, preferredAddress.longitude, 1)
+
+                    // Get the address line and country name in the current locale
+                    val addressLine = localizedAddress?.firstOrNull()?.getAddressLine(0)?.trim()
+                    favAddressMap[locale.language] = addressLine ?: "Unknown Address"
+
+                    // Store city and country names
+                    favCityName[locale.language] = preferredAddress.locality ?: preferredAddress.featureName
+                    favCountryNameMap[locale.language] = preferredAddress.countryName
+                }
+
+                // Log the preferred address
                 Log.i("PLACE", preferredAddress.toString())
                 val latLng = LatLng(preferredAddress.latitude, preferredAddress.longitude)
                 addOrUpdateMarker(latLng)
                 mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng), 1000, null)
 
-                Toast.makeText(this, "Location: ${preferredAddress.locality ?: preferredAddress.featureName}", Toast.LENGTH_SHORT).show()
+                // Set values in favCity object
+                favCity.lat_ = latLng.latitude
+                favCity.lng_ = latLng.longitude
+
+                favCity.addressArabic = favAddressMap["ar"] ?: "Unknown Address"
+                favCity.addressEnglish = favAddressMap["en"] ?: "Unknown Address"
+                favCity.addressRomanion = favCity.addressEnglish // Set Romanian address to English
+
+                favCity.countryArabic = favCountryNameMap["ar"] ?: "Unknown Country"
+                favCity.countryEnglish = favCountryNameMap["en"] ?: "Unknown Country"
+                favCity.countryRomanion = favCity.countryEnglish // Set Romanian country name to English
+
+                favCity.cityNameArabic = favCityName["ar"] ?: "Unknown City"
+                favCity.cityNameEnglish = favCityName["en"] ?: "Unknown City"
+                favCity.cityNameRomanian = favCity.cityNameEnglish // Set Romanian city name to English
+
+                // Prepare the display message
+                val displayAddress = "${favCity.addressEnglish} (${favCity.addressArabic})"
             } else {
                 Toast.makeText(this, "Location not found", Toast.LENGTH_SHORT).show()
             }

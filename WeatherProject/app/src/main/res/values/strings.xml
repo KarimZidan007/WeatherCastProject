@@ -14,7 +14,12 @@
     <string name="locationsrc">Location Source</string>
     <string name="windspeedunit">Wind Speed Unit</string>
     <string name="setting">Settings</string>
+    <string name="to">Select Location</string>
+    <string name="from">Time</string>
+    <string name="nottime">Notification time</string>
+    <string name="notfor">Notification For</string>
 
+    <string name="notifyby">Notify Me By\n</string>
 
     <string-array name="language_entries">
         <item>Arabic</item>
@@ -60,5 +65,8 @@
 
     <string name="google_maps_key">AIzaSyAQCz8DFn3w2ViFKcct5DVVtexJv6bS7M8</string>
     <string name="search">Search By City Name</string>
+    <string name="notification">Notification</string>
+    <string name="add">Add</string>
+    <string name="alarm">Alarm</string>
 
 </resources>

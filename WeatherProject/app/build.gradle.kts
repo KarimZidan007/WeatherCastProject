@@ -3,8 +3,16 @@ plugins {
     alias(libs.plugins.kotlin.android)
     id ("kotlin-kapt")
     id ("kotlin-parcelize")
-}
 
+}
+val coroutinesVersion = "1.7.1"
+val junitVersion = "4.13.2"
+val hamcrestVersion = "1.3"
+val archTestingVersion = "2.1.0"
+val robolectricVersion = "4.6.1"
+val androidXTestExtKotlinRunnerVersion = "1.1.3"
+val androidXTestCoreVersion = "1.5.0"
+val kotlin_version = "1.8.0"
 android {
     namespace = "com.example.weatherproject"
     compileSdk = 34
@@ -44,6 +52,8 @@ android {
             enableSplit = false
         }
     }
+
+
 
 }
 
@@ -85,5 +95,29 @@ dependencies {
     implementation ("org.osmdroid:osmdroid-android:6.1.12")
     implementation ("androidx.cardview:cardview:1.0.0")
     implementation ("pl.droidsonroids.gif:android-gif-drawable:1.2.29")
+    implementation("androidx.core:core-ktx:1.10.0")
+    implementation("androidx.appcompat:appcompat:1.5.1")
+    testImplementation("junit:junit:4.13.2")
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+
+    androidTestImplementation ("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation ("androidx.test.espresso:espresso-core:3.5.1")
+
+    testImplementation ("org.jetbrains.kotlin:kotlin-test:$kotlin_version")
+
+
+
+    testImplementation ("junit:junit:$junitVersion")
+    testImplementation ("org.hamcrest:hamcrest-all:$hamcrestVersion")
+    testImplementation ("androidx.arch.core:core-testing:$archTestingVersion")
+
+    testImplementation ("androidx.test.ext:junit-ktx:$androidXTestExtKotlinRunnerVersion")
+    testImplementation ("androidx.test:core-ktx:$androidXTestCoreVersion")
+    testImplementation ("org.robolectric:robolectric:4.8")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
+    androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
 
 }

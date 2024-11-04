@@ -5,9 +5,7 @@ import androidx.room.PrimaryKey
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class ForecastFinal (var temp:Double, var dt_txt: String, var icon:String) : Parcelable {
-    @PrimaryKey(autoGenerate = true)
-    var id: Int = 0
-    constructor():this(0.0,"","")
+data class ForecastFinal (var temp:String, var dt_txt: String, var icon:String) : Parcelable {
 
+    constructor():this("","","")
 }
